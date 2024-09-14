@@ -1,0 +1,59 @@
+{
+    "name": "oppara/cakephp-simple-recaptcha",
+    "description": "CakePHP plugin to handle google recaptcha with simple",
+    "type": "cakephp-plugin",
+    "license": "MIT",
+    "keywords": ["cakephp", "recaptcha"],
+    "homepage": "https://github.com/oppara/cakephp-simple-recaptcha",
+    "authors": [
+        {
+            "name": "oppara",
+            "email": "oppara@oppara.tv"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "cakephp/cakephp": "^5.0"
+    },
+    "require-dev": {
+        "cakephp/cakephp": "^5.0",
+        "cakephp/cakephp-codesniffer": "^5.0",
+        "phpunit/phpunit": "^10.1.0",
+        "cakedc/cakephp-phpstan": "^3.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Oppara\\SimpleRecaptcha\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Oppara\\SimpleRecaptcha\\Test\\": "tests/"
+        }
+    },
+    "scripts": {
+        "check": [
+            "@cs-check",
+            "@stan",
+            "@test"
+        ],
+        "cs-check": "phpcs --colors -p src/ tests/",
+        "cs-fix": "phpcbf --colors -p src/ tests/",
+        "phpstan": "tools/phpstan analyse",
+        "psalm": "tools/psalm --show-info=false",
+        "psalm-baseline": "tools/psalm  --set-baseline=psalm-baseline.xml",
+        "stan": [
+            "@phpstan",
+            "@psalm"
+        ],
+        "stan-baseline": "tools/phpstan --generate-baseline",
+        "stan-setup": "phive install",
+        "test": "phpunit",
+        "test-coverage": "phpunit --coverage-clover=clover.xml"
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+}
