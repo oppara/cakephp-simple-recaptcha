@@ -66,6 +66,14 @@ bin/cake plugin load Oppara/SimpleRecaptcha
     }
 ```
 
+`templates/layout/defalult.php`
+```
+
+<?= $this->fetch('scriptBottom'); ?>
+</body>
+</html>
+```
+
 `templates/SomeAwsome/index.php`
 ```
 <?= $this->Form->create() ?>
