@@ -1,6 +1,6 @@
 {
     "name": "oppara/cakephp-simple-recaptcha",
-    "description": "CakePHP plugin to handle google recaptcha with simple",
+    "description": "Google Recaptcha v3 plugin for CakePHP",
     "type": "cakephp-plugin",
     "license": "MIT",
     "keywords": ["cakephp", "recaptcha"],
