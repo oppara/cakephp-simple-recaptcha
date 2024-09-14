@@ -7,18 +7,18 @@ use Cake\Core\BasePlugin;
 use Cake\Core\PluginApplicationInterface;
 
 /**
- * Plugin for SimpleRecaptcha
+ * Plugin for Recaptcha
  *
  * @psalm-api
  */
-class SimpleRecaptchaPlugin extends BasePlugin
+class RecaptchaPlugin extends BasePlugin
 {
     /**
      * The name of this plugin
      *
      * @var string|null
      */
-    protected ?string $name = 'SimpleRecaptcha';
+    protected ?string $name = 'Recaptcha';
 
     /**
      * Console middleware

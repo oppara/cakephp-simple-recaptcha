@@ -8,13 +8,13 @@ use Cake\View\Helper;
 use RuntimeException;
 
 /**
- * SimpleRecaptcha helper
+ * Recaptcha helper
  *
  * @property \Cake\View\Helper\HtmlHelper $Html
  * @property \Cake\View\Helper\FormHelper $Form
  * @psalm-api
  */
-class SimpleRecaptchaHelper extends Helper
+class RecaptchaHelper extends Helper
 {
     /**
      * format of recaptcha api url

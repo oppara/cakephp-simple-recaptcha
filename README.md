@@ -36,7 +36,7 @@ bin/cake plugin load Oppara/SimpleRecaptcha
     {
         parent::initialize();
 
-        $this->loadComponent('Oppara/SimpleRecaptcha.SimpleRecaptcha', [
+        $this->loadComponent('Oppara/SimpleRecaptcha.Recaptcha', [
             'actions' => [
                 'index',
                 'confirm',
@@ -49,11 +49,11 @@ bin/cake plugin load Oppara/SimpleRecaptcha
         if ($this->request->is('post')) {
 
             try {
-                if ($this->SimpleRecaptcha->verify()) {
+                if ($this->Recaptcha->verify()) {
                     return $this->redirect(['action' => 'confirm']);
                 }
 
-                $this->log(json_encode($this->SimpleRecaptcha->getResult()), LOG_ERR);
+                $this->log(json_encode($this->Recaptcha->getResult()), LOG_ERR);
                 $this->Flash->error('recaptcha error.');
 
             } catch (NetworkException | RequestException $e) {
@@ -68,7 +68,7 @@ bin/cake plugin load Oppara/SimpleRecaptcha
 ```
 <?= $this->Form->create() ?>
 <?= $this->Form->control('email') ?>
-<?= $this->SimpleRecaptcha->hidden(); ?>
+<?= $this->Recaptcha->hidden(); ?>
 <?= $this->Form->button() ?>
 <?= $this->Form->end(); ?>
 ```

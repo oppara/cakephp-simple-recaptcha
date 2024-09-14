@@ -10,11 +10,11 @@ use Cake\Http\Client;
 use RuntimeException;
 
 /**
- * SimpleRecaptcha component
+ * Recaptcha component
  *
  * @psalm-api
  */
-class SimpleRecaptchaComponent extends Component
+class RecaptchaComponent extends Component
 {
     /**
      * Default configuration.
@@ -74,7 +74,7 @@ class SimpleRecaptchaComponent extends Component
         }
 
         $controller = $event->getSubject();
-        $controller->viewBuilder()->addHelper('Oppara/SimpleRecaptcha.SimpleRecaptcha', [
+        $controller->viewBuilder()->addHelper('Oppara/SimpleRecaptcha.Recaptcha', [
             'field' => $this->getConfig('field'),
         ]);
     }

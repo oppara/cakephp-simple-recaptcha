@@ -7,21 +7,21 @@ use Cake\Http\ServerRequest;
 use Cake\Routing\Router;
 use Cake\TestSuite\TestCase;
 use Cake\View\View;
-use Oppara\SimpleRecaptcha\View\Helper\SimpleRecaptchaHelper;
+use Oppara\SimpleRecaptcha\View\Helper\RecaptchaHelper;
 
 /**
- * SimpleRecaptcha\View\Helper\SimpleRecaptchaHelper Test Case
+ * SimpleRecaptcha\View\Helper\RecaptchaHelper Test Case
  *
  * @group helper
  */
-class SimpleRecaptchaHelperTest extends TestCase
+class RecaptchaHelperTest extends TestCase
 {
     /**
      * Test subject
      *
-     * @var \Oppara\SimpleRecaptcha\View\Helper\SimpleRecaptchaHelper
+     * @var \Oppara\SimpleRecaptcha\View\Helper\RecaptchaHelper
      */
-    protected $SimpleRecaptcha;
+    protected $Helper;
 
     /**
      * Mocked view
@@ -49,7 +49,7 @@ class SimpleRecaptchaHelperTest extends TestCase
             ->onlyMethods(['append'])
             ->setConstructorArgs([$request])
             ->getMock();
-        $this->SimpleRecaptcha = new SimpleRecaptchaHelper($this->View);
+        $this->Helper = new RecaptchaHelper($this->View);
     }
 
     /**
@@ -59,15 +59,15 @@ class SimpleRecaptchaHelperTest extends TestCase
      */
     protected function tearDown(): void
     {
-        unset($this->SimpleRecaptcha);
+        unset($this->Helper);
 
         parent::tearDown();
     }
 
     public function testHidden(): void
     {
-        $name = $this->SimpleRecaptcha->getConfig('field');
-        $this->assertHidden($this->SimpleRecaptcha, $name);
+        $name = $this->Helper->getConfig('field');
+        $this->assertHidden($this->Helper, $name);
     }
 
     public function testHiddenWithConfig(): void
@@ -76,12 +76,12 @@ class SimpleRecaptchaHelperTest extends TestCase
         $config = [
             'field' => $name,
         ];
-        $SimpleRecaptcha = new SimpleRecaptchaHelper($this->View, $config);
+        $Helper = new RecaptchaHelper($this->View, $config);
 
-        $this->assertHidden($SimpleRecaptcha, $name);
+        $this->assertHidden($Helper, $name);
     }
 
-    public function assertHidden(SimpleRecaptchaHelper $helper, string $name): void
+    public function assertHidden(RecaptchaHelper $helper, string $name): void
     {
         $expected = [ 'input' => [
             'type' => 'hidden',
@@ -94,13 +94,13 @@ class SimpleRecaptchaHelperTest extends TestCase
 
     public function testAfterRender(): void
     {
-        $key = $this->SimpleRecaptcha->getSiteKey();
-        $expected = sprintf(SimpleRecaptchaHelper::FMT_SCRIPT, $key);
+        $key = $this->Helper->getSiteKey();
+        $expected = sprintf(RecaptchaHelper::FMT_SCRIPT, $key);
 
-        $field = $this->SimpleRecaptcha->getConfig('field');
+        $field = $this->Helper->getConfig('field');
         $pattern = $this->makePattern($key, $field);
 
-        $block = $this->SimpleRecaptcha->getConfig('scriptBlock');
+        $block = $this->Helper->getConfig('scriptBlock');
         $this->View->expects($this->exactly(2))
            ->method('append')
            ->with(
@@ -110,7 +110,7 @@ class SimpleRecaptchaHelperTest extends TestCase
                )
            );
 
-        $this->SimpleRecaptcha->afterRender();
+        $this->Helper->afterRender();
     }
 
     public function testAfterRenderWithConfig(): void
@@ -121,10 +121,10 @@ class SimpleRecaptchaHelperTest extends TestCase
             'scriptBlock' => $block,
             'field' => $field,
         ];
-        $SimpleRecaptcha = new SimpleRecaptchaHelper($this->View, $config);
+        $SimpleRecaptcha = new RecaptchaHelper($this->View, $config);
 
         $key = $SimpleRecaptcha->getSiteKey();
-        $expected = sprintf(SimpleRecaptchaHelper::FMT_SCRIPT, $key);
+        $expected = sprintf(RecaptchaHelper::FMT_SCRIPT, $key);
 
         $field = $SimpleRecaptcha->getConfig('field');
         $pattern = $this->makePattern($key, $field);

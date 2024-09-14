@@ -8,21 +8,21 @@ use Cake\Controller\Controller;
 use Cake\Event\Event;
 use Cake\Http\ServerRequest;
 use Cake\TestSuite\TestCase;
-use Oppara\SimpleRecaptcha\Controller\Component\SimpleRecaptchaComponent;
+use Oppara\SimpleRecaptcha\Controller\Component\RecaptchaComponent;
 
 /**
- * SimpleRecaptcha\Controller\Component\SimpleRecaptchaComponent Test Case
+ * SimpleRecaptcha\Controller\Component\RecaptchaComponent Test Case
  *
  * @group component
  */
-class SimpleRecaptchaComponentTest extends TestCase
+class RecaptchaComponentTest extends TestCase
 {
     /**
      * Test subject
      *
-     * @var \Oppara\SimpleRecaptcha\Controller\Component\SimpleRecaptchaComponent
+     * @var \Oppara\SimpleRecaptcha\Controller\Component\RecaptchaComponent
      */
-    protected $SimpleRecaptcha;
+    protected $Recaptcha;
 
     /**
      * Controller
@@ -54,7 +54,7 @@ class SimpleRecaptchaComponentTest extends TestCase
 
         $request = new ServerRequest();
         $this->Controller = new Controller($request);
-        $this->SimpleRecaptcha = new SimpleRecaptchaComponent($this->Controller->components());
+        $this->Recaptcha = new RecaptchaComponent($this->Controller->components());
     }
 
     /**
@@ -64,12 +64,12 @@ class SimpleRecaptchaComponentTest extends TestCase
      */
     protected function tearDown(): void
     {
-        unset($this->SimpleRecaptcha);
+        unset($this->Recaptcha);
 
         parent::tearDown();
     }
 
-    public function startUp(SimpleRecaptchaComponent $component, string $action, string $token = 'hogehoge'): void
+    public function startUp(RecaptchaComponent $component, string $action, string $token = 'hogehoge'): void
     {
         $field = $component->getConfig('field');
         $request = $this->Controller->getRequest()
@@ -85,46 +85,46 @@ class SimpleRecaptchaComponentTest extends TestCase
 
     public function testLoadedHelper(): void
     {
-        $this->startUp($this->SimpleRecaptcha, 'index');
+        $this->startUp($this->Recaptcha, 'index');
         $helpers = $this->Controller->viewBuilder()->getHelpers();
-        $this->assertTrue(array_key_exists('SimpleRecaptcha', $helpers));
+        $this->assertTrue(array_key_exists('Recaptcha', $helpers));
 
-        $field = $this->SimpleRecaptcha->getConfig('field');
-        $this->assertSame($field, $helpers['SimpleRecaptcha']['field']);
+        $field = $this->Recaptcha->getConfig('field');
+        $this->assertSame($field, $helpers['Recaptcha']['field']);
     }
 
     public function testNotLoadedHelper(): void
     {
-        $this->startUp($this->SimpleRecaptcha, 'other');
+        $this->startUp($this->Recaptcha, 'other');
         $helpers = $this->Controller->viewBuilder()->getHelpers();
-        $this->assertFalse(array_key_exists('SimpleRecaptcha', $helpers));
+        $this->assertFalse(array_key_exists('Recaptcha', $helpers));
     }
 
     public function testLoadedHelperWithConfig(): void
     {
-        $SimpleRecaptcha = new SimpleRecaptchaComponent($this->Controller->components(), $this->config);
-        $this->startUp($SimpleRecaptcha, 'confirm');
+        $Recaptcha = new RecaptchaComponent($this->Controller->components(), $this->config);
+        $this->startUp($Recaptcha, 'confirm');
 
         $helpers = $this->Controller->viewBuilder()->getHelpers();
-        $this->assertTrue(array_key_exists('SimpleRecaptcha', $helpers));
+        $this->assertTrue(array_key_exists('Recaptcha', $helpers));
 
-        $field = $SimpleRecaptcha->getConfig('field');
-        $this->assertSame($field, $helpers['SimpleRecaptcha']['field']);
+        $field = $Recaptcha->getConfig('field');
+        $this->assertSame($field, $helpers['Recaptcha']['field']);
     }
 
     public function testGetToken(): void
     {
         $token = 'bar';
-        $this->startUp($this->SimpleRecaptcha, 'index', $token);
-        $this->assertSame($token, $this->SimpleRecaptcha->getToken());
+        $this->startUp($this->Recaptcha, 'index', $token);
+        $this->assertSame($token, $this->Recaptcha->getToken());
     }
 
     /**
      * @param array<string, mixed> $return
      */
-    public function createVerifyMock(array $return): SimpleRecaptchaComponent
+    public function createVerifyMock(array $return): RecaptchaComponent
     {
-        $mock = $this->getMockBuilder(SimpleRecaptchaComponent::class)
+        $mock = $this->getMockBuilder(RecaptchaComponent::class)
            ->onlyMethods(['verifyRecaptcha'])
             ->setConstructorArgs([
                 new ComponentRegistry($this->Controller),
