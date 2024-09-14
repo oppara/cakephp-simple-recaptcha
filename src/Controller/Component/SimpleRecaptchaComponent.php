@@ -74,7 +74,9 @@ class SimpleRecaptchaComponent extends Component
         }
 
         $controller = $event->getSubject();
-        $controller->viewBuilder()->addHelper('Recaptcha', ['field' => $this->getConfig('field')]);
+        $controller->viewBuilder()->addHelper('Oppara/SimpleRecaptcha.SimpleRecaptcha', [
+            'field' => $this->getConfig('field'),
+        ]);
     }
 
     /**

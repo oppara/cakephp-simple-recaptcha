@@ -87,17 +87,17 @@ class SimpleRecaptchaComponentTest extends TestCase
     {
         $this->startUp($this->SimpleRecaptcha, 'index');
         $helpers = $this->Controller->viewBuilder()->getHelpers();
-        $this->assertTrue(array_key_exists('Recaptcha', $helpers));
+        $this->assertTrue(array_key_exists('SimpleRecaptcha', $helpers));
 
         $field = $this->SimpleRecaptcha->getConfig('field');
-        $this->assertSame($field, $helpers['Recaptcha']['field']);
+        $this->assertSame($field, $helpers['SimpleRecaptcha']['field']);
     }
 
     public function testNotLoadedHelper(): void
     {
         $this->startUp($this->SimpleRecaptcha, 'other');
         $helpers = $this->Controller->viewBuilder()->getHelpers();
-        $this->assertFalse(array_key_exists('Recaptcha', $helpers));
+        $this->assertFalse(array_key_exists('SimpleRecaptcha', $helpers));
     }
 
     public function testLoadedHelperWithConfig(): void
@@ -106,10 +106,10 @@ class SimpleRecaptchaComponentTest extends TestCase
         $this->startUp($SimpleRecaptcha, 'confirm');
 
         $helpers = $this->Controller->viewBuilder()->getHelpers();
-        $this->assertTrue(array_key_exists('Recaptcha', $helpers));
+        $this->assertTrue(array_key_exists('SimpleRecaptcha', $helpers));
 
         $field = $SimpleRecaptcha->getConfig('field');
-        $this->assertSame($field, $helpers['Recaptcha']['field']);
+        $this->assertSame($field, $helpers['SimpleRecaptcha']['field']);
     }
 
     public function testGetToken(): void
