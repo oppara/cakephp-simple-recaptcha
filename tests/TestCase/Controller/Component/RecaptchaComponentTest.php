@@ -38,8 +38,9 @@ class RecaptchaComponentTest extends TestCase
      */
     private $config = [
             'actions' => ['index', 'confirm'],
-            'field' => 'fooToken',
             'score' => 0.7,
+            'field' => 'fooToken',
+            'scriptBlock' => 'hogehoge',
         ];
 
     /**
@@ -110,6 +111,9 @@ class RecaptchaComponentTest extends TestCase
 
         $field = $Recaptcha->getConfig('field');
         $this->assertSame($field, $helpers['Recaptcha']['field']);
+
+        $block = $Recaptcha->getConfig('scriptBlock');
+        $this->assertSame($block, $helpers['Recaptcha']['scriptBlock']);
     }
 
     public function testGetToken(): void

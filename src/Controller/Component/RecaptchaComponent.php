@@ -27,8 +27,9 @@ class RecaptchaComponent extends Component
      */
     protected array $_defaultConfig = [
         'actions' => ['index'],
-        'field' => 'recaptchaToken',
         'score' => 0.5,
+        'field' => 'recaptchaToken',
+        'scriptBlock' => 'scriptBottom',
     ];
 
     /**
@@ -76,6 +77,7 @@ class RecaptchaComponent extends Component
         $controller = $event->getSubject();
         $controller->viewBuilder()->addHelper('Oppara/SimpleRecaptcha.Recaptcha', [
             'field' => $this->getConfig('field'),
+            'scriptBlock' => $this->getConfig('scriptBlock'),
         ]);
     }
 
