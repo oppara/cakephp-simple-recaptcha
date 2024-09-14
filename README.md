@@ -1,3 +1,5 @@
+[![Build Status](https://img.shields.io/github/actions/workflow/status/oppara/cakephp-simple-recaptcha/ci.yml)](https://github.com/oppara/cakephp-simple-recaptcha/actions?query=workflow%3ACI+branch%3Amain)
+
 # Google Recaptcha v3 plugin for CakePHP
 
 # Requirements
