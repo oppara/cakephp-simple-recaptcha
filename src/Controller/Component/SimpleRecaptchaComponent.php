@@ -97,7 +97,7 @@ class SimpleRecaptchaComponent extends Component
     }
 
     /**
-     * reCAPTCHAからのレスポンスを取得する
+     * Getting a response from reCAPTCHA
      *
      * @param string $token
      * @return array<string, mixed>
