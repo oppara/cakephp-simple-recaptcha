@@ -42,7 +42,7 @@ EOF;
     /**
      * helpers to use
      *
-     * @var array<string>
+     * @var array<array-key, mixed>
      */
     public array $helpers = [
         'Html',
