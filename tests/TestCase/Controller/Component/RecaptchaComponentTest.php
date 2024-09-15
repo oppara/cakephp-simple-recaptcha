@@ -22,7 +22,7 @@ class RecaptchaComponentTest extends TestCase
      *
      * @var \Oppara\SimpleRecaptcha\Controller\Component\RecaptchaComponent
      */
-    protected $Recaptcha;
+    protected $Component;
 
     /**
      * Controller
@@ -55,7 +55,7 @@ class RecaptchaComponentTest extends TestCase
 
         $request = new ServerRequest();
         $this->Controller = new Controller($request);
-        $this->Recaptcha = new RecaptchaComponent($this->Controller->components());
+        $this->Component = new RecaptchaComponent($this->Controller->components());
     }
 
     /**
@@ -65,7 +65,8 @@ class RecaptchaComponentTest extends TestCase
      */
     protected function tearDown(): void
     {
-        unset($this->Recaptcha);
+        unset($this->Component);
+        unset($this->controller);
 
         parent::tearDown();
     }
@@ -86,60 +87,41 @@ class RecaptchaComponentTest extends TestCase
 
     public function testLoadedHelper(): void
     {
-        $this->startUp($this->Recaptcha, 'index');
+        $this->startUp($this->Component, 'index');
         $helpers = $this->Controller->viewBuilder()->getHelpers();
         $this->assertTrue(array_key_exists('Recaptcha', $helpers));
 
-        $field = $this->Recaptcha->getConfig('field');
+        $field = $this->Component->getConfig('field');
         $this->assertSame($field, $helpers['Recaptcha']['field']);
     }
 
     public function testNotLoadedHelper(): void
     {
-        $this->startUp($this->Recaptcha, 'other');
+        $this->startUp($this->Component, 'other');
         $helpers = $this->Controller->viewBuilder()->getHelpers();
         $this->assertFalse(array_key_exists('Recaptcha', $helpers));
     }
 
     public function testLoadedHelperWithConfig(): void
     {
-        $Recaptcha = new RecaptchaComponent($this->Controller->components(), $this->config);
-        $this->startUp($Recaptcha, 'confirm');
+        $component = new RecaptchaComponent($this->Controller->components(), $this->config);
+        $this->startUp($component, 'confirm');
 
         $helpers = $this->Controller->viewBuilder()->getHelpers();
         $this->assertTrue(array_key_exists('Recaptcha', $helpers));
 
-        $field = $Recaptcha->getConfig('field');
+        $field = $component->getConfig('field');
         $this->assertSame($field, $helpers['Recaptcha']['field']);
 
-        $block = $Recaptcha->getConfig('scriptBlock');
+        $block = $component->getConfig('scriptBlock');
         $this->assertSame($block, $helpers['Recaptcha']['scriptBlock']);
     }
 
     public function testGetToken(): void
     {
         $token = 'bar';
-        $this->startUp($this->Recaptcha, 'index', $token);
-        $this->assertSame($token, $this->Recaptcha->getToken());
-    }
-
-    /**
-     * @param array<string, mixed> $return
-     */
-    public function createVerifyMock(array $return): RecaptchaComponent
-    {
-        $mock = $this->getMockBuilder(RecaptchaComponent::class)
-           ->onlyMethods(['verifyRecaptcha'])
-            ->setConstructorArgs([
-                new ComponentRegistry($this->Controller),
-            ])
-           ->getMock();
-
-        $mock->expects($this->once())
-            ->method('verifyRecaptcha')
-            ->willReturn($return);
-
-        return $mock;
+        $this->startUp($this->Component, 'index', $token);
+        $this->assertSame($token, $this->Component->getToken());
     }
 
     /**
@@ -164,5 +146,24 @@ class RecaptchaComponentTest extends TestCase
            [false, ['success' => true, 'score' => 0.4]],
            [false, ['success' => false, 'score' => 0.7]],
         ];
+    }
+
+    /**
+     * @param array<string, mixed> $return
+     */
+    public function createVerifyMock(array $return): RecaptchaComponent
+    {
+        $mock = $this->getMockBuilder(RecaptchaComponent::class)
+           ->onlyMethods(['verifyRecaptcha'])
+            ->setConstructorArgs([
+                new ComponentRegistry($this->Controller),
+            ])
+           ->getMock();
+
+        $mock->expects($this->once())
+            ->method('verifyRecaptcha')
+            ->willReturn($return);
+
+        return $mock;
     }
 }

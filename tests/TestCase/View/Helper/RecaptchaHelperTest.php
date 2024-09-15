@@ -60,6 +60,7 @@ class RecaptchaHelperTest extends TestCase
     protected function tearDown(): void
     {
         unset($this->Helper);
+        unset($this->View);
 
         parent::tearDown();
     }
