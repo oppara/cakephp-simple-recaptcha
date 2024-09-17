@@ -40,13 +40,12 @@ bin/cake plugin load Oppara/SimpleRecaptcha
 
         $this->loadComponent('Oppara/SimpleRecaptcha.Recaptcha', [
             'actions' => [
-                'index',
-                'confirm',
+                'input',
             ],
         ]);
     }
 
-    public function index()
+    public function input()
     {
         if ($this->request->is('post')) {
 
@@ -74,7 +73,7 @@ bin/cake plugin load Oppara/SimpleRecaptcha
 </html>
 ```
 
-`templates/SomeAwsome/index.php`
+`templates/SomeAwsome/input.php`
 ```
 <?= $this->Form->create() ?>
 <?= $this->Form->control('email') ?>
