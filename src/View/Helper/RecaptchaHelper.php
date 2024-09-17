@@ -145,7 +145,6 @@ EOF;
         $block = $this->getConfig('scriptBlock');
         $field = $this->getConfig('field');
         $script = sprintf(self::FMT_SCRIPT_BLOCK, $this->siteKey, $field);
-
         $this->Html->scriptBlock($script, ['block' => $block]);
     }
 }
