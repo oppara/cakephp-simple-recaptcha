@@ -19,9 +19,10 @@ class RecaptchaComponent extends Component
     /**
      * Default configuration.
      *
-     * - actions: actions to use reCAPTCHA
-     * - field: hidden field name for recaptcha token
+     * - actions: contoroller's actions that use reCAPTCHA
      * - score: minimum score to pass reCAPTCHA
+     * - field: hidden field name for recaptcha token
+     * - scriptBlock: script block name to insert reCAPTCHA script
      *
      * @var array<string, mixed>
      */
