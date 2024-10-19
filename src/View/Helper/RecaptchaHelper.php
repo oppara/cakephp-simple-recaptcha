@@ -17,18 +17,18 @@ use RuntimeException;
 class RecaptchaHelper extends Helper
 {
     /**
-     * format of recaptcha api url
+     * api url
      *
      * @var string
      */
-    public const FMT_SCRIPT = 'https://www.google.com/recaptcha/api.js?render=%s';
+    public const API_URL = 'https://www.google.com/recaptcha/api.js';
 
     /**
-     * format of recaptcha script block
+     * format of reCAPTCHA v3 script block
      *
      * @var string
      */
-    public const FMT_SCRIPT_BLOCK = <<<EOF
+    public const FMT_V3_SCRIPT_BLOCK = <<<EOF
 
 grecaptcha.ready(function () {
   grecaptcha.execute('%s', {action: 'submit'}).then(function(token) {
@@ -38,6 +38,13 @@ grecaptcha.ready(function () {
 });
 
 EOF;
+
+    /**
+     * format of reCAPTCHA v2 checkbox
+     *
+     * @var string
+     */
+    public const FMT_V2_CHECKBOX = '<div class="%s" data-sitekey="%s" %s></div>';
 
     /**
      * helpers to use
@@ -52,22 +59,40 @@ EOF;
     /**
      * Default configuration.
      *
-     * - field: hidden field name for recaptcha token
      * - scriptBlock: block name to append recaptcha script
+     * - field: hidden field name for recaptcha v3 token
+     * - classV2: class name for recaptcha v2
+     * - useV2: use reCAPTCHA v2 ?
      *
      * @var array<string, mixed>
      */
     protected array $_defaultConfig = [
-        'field' => 'recaptchaToken',
         'scriptBlock' => 'scriptBottom',
+        'field' => 'recaptchaToken',
+        'classV2' => 'g-recaptcha',
+        'useV2' => false,
     ];
 
     /**
-     * site key for reCAPTCHA
+     * site key for reCAPTCHA v3
      *
      * @var string
      */
-    private string $siteKey = '';
+    private string $siteKeyV3 = '';
+
+    /**
+     * site key for reCAPTCHA v2
+     *
+     * @var string
+     */
+    private string $siteKeyV2 = '';
+
+    /**
+     * use reCAPTCHA v2 ?
+     *
+     * @var bool
+     */
+    private bool $useV2 = false;
 
     /**
      * constructor hook method
@@ -79,10 +104,16 @@ EOF;
     {
         parent::initialize($config);
 
-        $this->siteKey = Configure::read('Recaptcha.v3.site_key', '');
+        $this->useV2 = $this->getConfig('useV2');
 
-        if (empty($this->siteKey)) {
-            throw new RuntimeException('Recaptcha site key is not set.');
+        $this->siteKeyV3 = Configure::read('Recaptcha.v3.site_key', '');
+        if (empty($this->siteKeyV3)) {
+            throw new RuntimeException('Recaptcha v3 site key is not set.');
+        }
+
+        $this->siteKeyV2 = Configure::read('Recaptcha.v2.site_key', '');
+        if ($this->useV2 && empty($this->siteKeyV2)) {
+            throw new RuntimeException('Recaptcha v2 site key is not set.');
         }
     }
 
@@ -93,22 +124,53 @@ EOF;
      */
     public function getSiteKey(): string
     {
-        return $this->siteKey;
+        if ($this->useV2) {
+            return $this->siteKeyV2;
+        }
+
+        return $this->siteKeyV3;
     }
 
     /**
-     * creates a hidden form input field for reCAPTCHA
+     * return hidden input field for reCAPTCHA v3
      *
      * @return string
      */
     public function hidden(): string
     {
+        if ($this->useV2) {
+            return '';
+        }
+
         $field = $this->getConfig('field');
 
         return $this->Form->hidden($field, [
             'id' => $field,
             'value' => '',
         ]);
+    }
+
+    /**
+     * return checkbox for reCAPTCHA v2
+     *
+     * Additional attributes example:
+     * ```
+     * echo $this->Recaptcha->checkbox('data-theme="dark" data-size="compact"');
+     * ```
+     *
+     * @link https://developers.google.com/recaptcha/docs/display#render_param g-recaptcha tag attributes
+     * @param string $attr Additional attributes
+     * @return string
+     */
+    public function checkbox(string $attr = ''): string
+    {
+        if (!$this->useV2) {
+            return '';
+        }
+
+        $class = $this->getConfig('classV2');
+
+        return sprintf(self::FMT_V2_CHECKBOX, $class, $this->siteKeyV2, $attr);
     }
 
     /**
@@ -131,7 +193,12 @@ EOF;
     private function script(): void
     {
         $block = $this->getConfig('scriptBlock');
-        $src = sprintf(self::FMT_SCRIPT, $this->siteKey);
+
+        if ($this->useV2) {
+            $src = self::API_URL;
+        } else {
+            $src = self::API_URL . '?render=' . $this->siteKeyV3;
+        }
         $this->Html->script($src, ['block' => $block]);
     }
 
@@ -142,9 +209,13 @@ EOF;
      */
     private function scriptBlock(): void
     {
+        if ($this->useV2) {
+            return;
+        }
+
         $block = $this->getConfig('scriptBlock');
         $field = $this->getConfig('field');
-        $script = sprintf(self::FMT_SCRIPT_BLOCK, $this->siteKey, $field);
+        $script = sprintf(self::FMT_V3_SCRIPT_BLOCK, $this->siteKeyV3, $field);
         $this->Html->scriptBlock($script, ['block' => $block]);
     }
 }
