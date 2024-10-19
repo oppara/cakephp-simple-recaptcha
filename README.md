@@ -78,7 +78,7 @@ bin/cake plugin load Oppara/SimpleRecaptcha
 <?= $this->Form->create() ?>
 <?= $this->Form->control('email') ?>
 <?= $this->Recaptcha->hidden(); ?>
-<?= $this->Form->button() ?>
+<?= $this->Form->button('submit') ?>
 <?= $this->Form->end(); ?>
 ```
 
