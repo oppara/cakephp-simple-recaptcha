@@ -57,7 +57,7 @@ bin/cake plugin load Oppara/SimpleRecaptcha
                 $this->log(json_encode($this->Recaptcha->getResult()), LOG_ERR);
                 $this->Flash->error('recaptcha error.');
 
-            } catch (NetworkException | RequestException $e) {
+            } catch (\Cake\Http\Client\Exception\NetworkException | \Cake\Http\Client\Exception\RequestException $e) {
                 $this->log($e->getMessage(), LOG_ERR);
                 $this->Flash->error('network error.');
             }
