@@ -65,6 +65,15 @@ class RecaptchaHelperTest extends TestCase
         parent::tearDown();
     }
 
+    public function createV2Helper(array $config = []): RecaptchaHelper
+    {
+        $config += [
+            'useV2' => true,
+        ];
+
+        return new RecaptchaHelper($this->View, $config);
+    }
+
     public function testHidden(): void
     {
         $name = $this->Helper->getConfig('field');
@@ -93,13 +102,18 @@ class RecaptchaHelperTest extends TestCase
         $this->assertHtml($expected, $helper->hidden());
     }
 
+    public function testCheckbox(): void
+    {
+        $this->assertSame('', $this->Helper->checkbox());
+    }
+
     public function testAfterRender(): void
     {
         $key = $this->Helper->getSiteKey();
-        $expected = sprintf(RecaptchaHelper::FMT_SCRIPT, $key);
+        $expected = RecaptchaHelper::API_URL;
 
         $field = $this->Helper->getConfig('field');
-        $pattern = $this->makePattern($key, $field);
+        $pattern = $this->makeV3Pattern($key, $field);
 
         $block = $this->Helper->getConfig('scriptBlock');
         $this->View->expects($this->exactly(2))
@@ -125,10 +139,10 @@ class RecaptchaHelperTest extends TestCase
         $SimpleRecaptcha = new RecaptchaHelper($this->View, $config);
 
         $key = $SimpleRecaptcha->getSiteKey();
-        $expected = sprintf(RecaptchaHelper::FMT_SCRIPT, $key);
+        $expected = RecaptchaHelper::API_URL;
 
         $field = $SimpleRecaptcha->getConfig('field');
-        $pattern = $this->makePattern($key, $field);
+        $pattern = $this->makeV3Pattern($key, $field);
 
         $block = $SimpleRecaptcha->getConfig('scriptBlock');
         $this->View->expects($this->exactly(2))
@@ -143,10 +157,64 @@ class RecaptchaHelperTest extends TestCase
         $SimpleRecaptcha->afterRender();
     }
 
-    public function makePattern(string $key, string $field): string
+    public function makeV3Pattern(string $key, string $field): string
     {
         $fmt = "/grecaptcha.execute\('%s', {action: 'submit'}\).+document.getElementById\('%s'\)/ms";
 
         return sprintf($fmt, $key, $field);
+    }
+
+    public function testHiddenUseV2(): void
+    {
+        $Helper = $this->createV2Helper();
+
+        $this->assertSame('', $Helper->hidden());
+    }
+
+    public function testCheckboxUseV2(): void
+    {
+        $Helper = $this->createV2Helper();
+        $key = $Helper->getSiteKey();
+        $class = $Helper->getConfig('classV2');
+        $expected = sprintf(RecaptchaHelper::FMT_V2_CHECKBOX, $class, $key, '');
+        $this->assertSame($expected, $Helper->checkbox());
+    }
+
+    public function testCheckboxUseV2WithConfig(): void
+    {
+        $class = 'foo';
+        $Helper = $this->createV2Helper([
+            'classV2' => $class,
+        ]);
+        $key = $Helper->getSiteKey();
+        $expected = sprintf(RecaptchaHelper::FMT_V2_CHECKBOX, $class, $key, '');
+        $this->assertSame($expected, $Helper->checkbox());
+    }
+
+    public function testCheckboxUseV2WitAttribute(): void
+    {
+        $attr = 'data-foo="bar"';
+        $Helper = $this->createV2Helper();
+        $key = $Helper->getSiteKey();
+        $class = $Helper->getConfig('classV2');
+        $expected = sprintf(RecaptchaHelper::FMT_V2_CHECKBOX, $class, $key, $attr);
+        $this->assertSame($expected, $Helper->checkbox($attr));
+    }
+
+    public function testAfterRenderUseV2(): void
+    {
+        $Helper = $this->createV2Helper();
+        $expected = RecaptchaHelper::API_URL;
+
+        $block = $Helper->getConfig('scriptBlock');
+        $this->View->expects($this->exactly(1))
+           ->method('append')
+           ->with(
+               ...self::withConsecutive(
+                   [$block, $this->stringContains($expected)],
+               )
+           );
+
+        $Helper->afterRender();
     }
 }

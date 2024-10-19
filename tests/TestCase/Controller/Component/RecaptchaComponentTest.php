@@ -5,10 +5,12 @@ namespace Oppara\SimpleRecaptcha\Test\TestCase\Controller\Component;
 
 use Cake\Controller\ComponentRegistry;
 use Cake\Controller\Controller;
+use Cake\Core\Configure;
 use Cake\Event\Event;
 use Cake\Http\ServerRequest;
 use Cake\TestSuite\TestCase;
 use Oppara\SimpleRecaptcha\Controller\Component\RecaptchaComponent;
+use Oppara\SimpleRecaptcha\Exception\RecaptchaV3Exception;
 
 /**
  * SimpleRecaptcha\Controller\Component\RecaptchaComponent Test Case
@@ -74,11 +76,13 @@ class RecaptchaComponentTest extends TestCase
     public function startUp(RecaptchaComponent $component, string $action, string $token = 'hogehoge'): void
     {
         $field = $component->getConfig('field');
+        $classV2 = $component->getConfig('classV2') . '-response';
         $request = $this->Controller->getRequest()
             ->withAttribute('params', [
                 'controller' => 'Foo',
                 'action' => $action,
             ])
+            ->withData($classV2, $token)
             ->withData($field, $token);
 
         $this->Controller->setRequest($request);
@@ -117,11 +121,18 @@ class RecaptchaComponentTest extends TestCase
         $this->assertSame($block, $helpers['Recaptcha']['scriptBlock']);
     }
 
-    public function testGetToken(): void
+    public function testGetV3Token(): void
     {
         $token = 'bar';
         $this->startUp($this->Component, 'index', $token);
-        $this->assertSame($token, $this->Component->getToken());
+        $this->assertSame($token, $this->Component->getV3Token());
+    }
+
+    public function testGetV2Token(): void
+    {
+        $token = 'hoge';
+        $this->startUp($this->Component, 'index', $token);
+        $this->assertSame($token, $this->Component->getV2Token());
     }
 
     /**
@@ -131,6 +142,8 @@ class RecaptchaComponentTest extends TestCase
      */
     public function testVerify(bool $expected, array $args): void
     {
+        Configure::delete('Recaptcha.v2.site_key');
+        Configure::delete('Recaptcha.v2.secret_key');
         $mock = $this->createVerifyMock($args);
         $this->assertSame($expected, $mock->verify());
     }
@@ -153,6 +166,63 @@ class RecaptchaComponentTest extends TestCase
      */
     public function createVerifyMock(array $return): RecaptchaComponent
     {
+        $mock = $this->getMockBuilder(RecaptchaComponent::class)
+           ->onlyMethods(['verifyRecaptcha'])
+            ->setConstructorArgs([
+                new ComponentRegistry($this->Controller),
+            ])
+           ->getMock();
+
+        $mock->expects($this->once())
+            ->method('verifyRecaptcha')
+            ->willReturn($return);
+
+        return $mock;
+    }
+
+    public function testVerifyUseV2WithException(): void
+    {
+        $this->expectException(RecaptchaV3Exception::class);
+
+        $args = [
+            'success' => false,
+            'score' => 0.7,
+        ];
+        $this->createVerifyMock($args)->verify();
+    }
+
+    /**
+     * @dataProvider verifyUseV2Provider
+     * @param bool $expected
+     * @param array<string, mixed> $args
+     */
+    public function testVerifyUseV2(bool $expected, array $args): void
+    {
+        $mock = $this->createVerifyMockUseV2($args);
+        $this->assertSame($expected, $mock->verify());
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public static function verifyUseV2Provider(): array
+    {
+        return [
+           [true, ['success' => true]],
+           [false, ['success' => false]],
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $return
+     */
+    public function createVerifyMockUseV2(array $return): RecaptchaComponent
+    {
+        $classV2 = $this->Component->getConfig('classV2') . '-response';
+        $request = $this->Controller->getRequest()
+            ->withData($classV2, 'hoge');
+
+        $this->Controller->setRequest($request);
         $mock = $this->getMockBuilder(RecaptchaComponent::class)
            ->onlyMethods(['verifyRecaptcha'])
             ->setConstructorArgs([
