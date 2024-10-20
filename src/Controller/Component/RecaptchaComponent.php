@@ -45,7 +45,7 @@ class RecaptchaComponent extends Component
     private string $secretKeyV3 = '';
 
     /**
-     * site key for reCAPTCHA v2
+     * Secret key for reCAPTCHA v2
      *
      * @var string
      */
