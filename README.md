@@ -4,7 +4,7 @@
 
 If you configure reCAPTCHA v2, that acts as a fallback.
 
-# Requirements
+## Requirements
 
 * PHP 8.1+
 * CakePHP 5.0+
