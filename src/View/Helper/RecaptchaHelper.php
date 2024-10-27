@@ -107,13 +107,14 @@ EOF;
         $this->useV2 = $this->getConfig('useV2');
 
         $this->siteKeyV3 = Configure::read('Recaptcha.v3.site_key', '');
-        if (empty($this->siteKeyV3)) {
-            throw new RuntimeException('Recaptcha v3 site key is not set.');
+        $this->siteKeyV2 = Configure::read('Recaptcha.v2.site_key', '');
+
+        if ($this->siteKeyV3 === '' && $this->siteKeyV2 === '') {
+            throw new RuntimeException('Recaptcha site key is not set.');
         }
 
-        $this->siteKeyV2 = Configure::read('Recaptcha.v2.site_key', '');
-        if ($this->useV2 && empty($this->siteKeyV2)) {
-            throw new RuntimeException('Recaptcha v2 site key is not set.');
+        if ($this->siteKeyV3 === '' && $this->siteKeyV2 !== '') {
+            $this->useV2 = true;
         }
     }
 

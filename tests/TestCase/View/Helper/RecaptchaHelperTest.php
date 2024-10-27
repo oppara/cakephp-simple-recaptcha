@@ -3,11 +3,13 @@ declare(strict_types=1);
 
 namespace Oppara\SimpleRecaptcha\Test\TestCase\View\Helper;
 
+use Cake\Core\Configure;
 use Cake\Http\ServerRequest;
 use Cake\Routing\Router;
 use Cake\TestSuite\TestCase;
 use Cake\View\View;
 use Oppara\SimpleRecaptcha\View\Helper\RecaptchaHelper;
+use RuntimeException;
 
 /**
  * SimpleRecaptcha\View\Helper\RecaptchaHelper Test Case
@@ -38,6 +40,9 @@ class RecaptchaHelperTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        Configure::write('Recaptcha.v3.site_key', 'foobar');
+        Configure::write('Recaptcha.v2.site_key', 'barbaz');
 
         $request = new ServerRequest([
             'webroot' => '',
@@ -74,6 +79,15 @@ class RecaptchaHelperTest extends TestCase
         return new RecaptchaHelper($this->View, $config);
     }
 
+    public function testThrowException(): void
+    {
+        $this->expectException(RuntimeException::class);
+
+        Configure::delete('Recaptcha.v3.site_key');
+        Configure::delete('Recaptcha.v2.site_key');
+        $this->Helper = new RecaptchaHelper($this->View);
+    }
+
     public function testHidden(): void
     {
         $name = $this->Helper->getConfig('field');
@@ -100,6 +114,13 @@ class RecaptchaHelperTest extends TestCase
             'value' => '',
         ]];
         $this->assertHtml($expected, $helper->hidden());
+    }
+
+    public function testHiddenUseV2(): void
+    {
+        $Helper = $this->createV2Helper();
+
+        $this->assertSame('', $Helper->hidden());
     }
 
     public function testCheckbox(): void
@@ -162,13 +183,6 @@ class RecaptchaHelperTest extends TestCase
         $fmt = "/grecaptcha.execute\('%s', {action: 'submit'}\).+document.getElementById\('%s'\)/ms";
 
         return sprintf($fmt, $key, $field);
-    }
-
-    public function testHiddenUseV2(): void
-    {
-        $Helper = $this->createV2Helper();
-
-        $this->assertSame('', $Helper->hidden());
     }
 
     public function testCheckboxUseV2(): void
