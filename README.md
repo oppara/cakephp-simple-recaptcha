@@ -2,9 +2,9 @@
 
 # CakePHP plugin to handle Google Recaptcha
 
-If both v2 and v3 are configured, it will act as v3 and use v2 as a fallback.
-If only v3 is configured, it will act as v3.
-And V2 so.
+If both v2 and v3 are configured, it will act as v3 and use v2 as a fallback.  
+If only v3 is configured, it will act as v3.  
+And V2 so.  
 
 ## Requirements
 
