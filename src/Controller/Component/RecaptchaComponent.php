@@ -45,7 +45,7 @@ class RecaptchaComponent extends Component
     private string $secretKeyV3 = '';
 
     /**
-     * site key for reCAPTCHA v2
+     * Secret key for reCAPTCHA v2
      *
      * @var string
      */
@@ -76,11 +76,11 @@ class RecaptchaComponent extends Component
         parent::initialize($config);
 
         $this->secretKeyV3 = Configure::read('Recaptcha.v3.secret_key', '');
-        if (empty($this->secretKeyV3)) {
-            throw new RuntimeException('Recaptcha v3 secret key is not set.');
-        }
-
         $this->secretKeyV2 = Configure::read('Recaptcha.v2.secret_key', '');
+
+        if ($this->secretKeyV3 === '' && $this->secretKeyV2 === '') {
+            throw new RuntimeException('Recaptcha secret key is not set.');
+        }
     }
 
     /**
@@ -118,6 +118,10 @@ class RecaptchaComponent extends Component
             return true;
         }
 
+        if ($this->secretKeyV3 === '' && $this->secretKeyV2 !== '') {
+            return true;
+        }
+
         return false;
     }
 
@@ -132,10 +136,10 @@ class RecaptchaComponent extends Component
     public function verify(): bool
     {
         if ($this->useV2()) {
-            return $this->verifyRecaptchaV2();
+            return $this->verifyV2();
         }
 
-        return $this->verifyRecaptchaV3();
+        return $this->verifyV3();
     }
 
     /**
@@ -143,7 +147,7 @@ class RecaptchaComponent extends Component
      *
      * @return bool
      */
-    public function verifyRecaptchaV3(): bool
+    private function verifyV3(): bool
     {
         $token = $this->getV3Token();
         $tmp = $this->verifyRecaptcha($this->secretKeyV3, $token);
@@ -164,7 +168,7 @@ class RecaptchaComponent extends Component
      *
      * @return bool
      */
-    public function verifyRecaptchaV2(): bool
+    private function verifyV2(): bool
     {
         $token = $this->getV2Token();
         $tmp = $this->verifyRecaptcha($this->secretKeyV2, $token);

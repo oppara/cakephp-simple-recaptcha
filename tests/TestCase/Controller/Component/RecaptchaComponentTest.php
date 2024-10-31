@@ -11,6 +11,7 @@ use Cake\Http\ServerRequest;
 use Cake\TestSuite\TestCase;
 use Oppara\SimpleRecaptcha\Controller\Component\RecaptchaComponent;
 use Oppara\SimpleRecaptcha\Exception\RecaptchaV3Exception;
+use RuntimeException;
 
 /**
  * SimpleRecaptcha\Controller\Component\RecaptchaComponent Test Case
@@ -55,6 +56,9 @@ class RecaptchaComponentTest extends TestCase
         parent::setUp();
         static::setAppNamespace();
 
+        Configure::write('Recaptcha.v3.secret_key', 'hogemoge');
+        Configure::write('Recaptcha.v2.secret_key', 'mogepiyo');
+
         $request = new ServerRequest();
         $this->Controller = new Controller($request);
         $this->Component = new RecaptchaComponent($this->Controller->components());
@@ -87,6 +91,16 @@ class RecaptchaComponentTest extends TestCase
 
         $this->Controller->setRequest($request);
         $component->startUp(new Event('Controller.startup', $this->Controller));
+    }
+
+    public function testIniatlizeException()
+    {
+        $this->expectException(RuntimeException::class);
+
+        Configure::delete('Recaptcha.v3.secret_key');
+        Configure::delete('Recaptcha.v2.secret_key');
+
+        new RecaptchaComponent($this->Controller->components());
     }
 
     public function testLoadedHelper(): void

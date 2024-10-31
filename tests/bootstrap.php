@@ -38,10 +38,3 @@ if (file_exists($root . '/config/bootstrap.php')) {
 
     return;
 }
-
-use Cake\Core\Configure;
-
-Configure::write('Recaptcha.v3.site_key', 'foobar');
-Configure::write('Recaptcha.v3.secret_key', 'hogemoge');
-Configure::write('Recaptcha.v2.site_key', 'barbaz');
-Configure::write('Recaptcha.v2.secret_key', 'mogepiyo');
