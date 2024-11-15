@@ -175,9 +175,9 @@ EOF;
     }
 
     /**
-     * append reCAPTCHA script tab & block to a specific block
+     * append reCAPTCHA script tag & block to a specific block
      *
-     * @aaparam \Cake\Event\EventInterface $event
+     * @param \Cake\Event\EventInterface $event
      * @return void
      */
     public function afterRender(): void
